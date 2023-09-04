@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>חיפוש במטריקס</title>
+    <style>
+      body {
+        background-color: black;
+        color: #0f0;
+        font-family: "Courier New", monospace;
+        font-size: 16px;
+        overflow: hidden;
+        direction: rtl;
+        text-align: right;
+        text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+      }
+
+      #matrixDisplay {
+        position: absolute;
+        top: 0;
+        right: 600px;
+        width: 50%;
+        height: 100%;
+        display: block;
+        white-space: pre;
+        background-color: black;
+        color: #0f0;
+        font-family: "Courier New", monospace;
+        font-size: 16px;
+        overflow: hidden;
+        animation: matrixAnimation 10s linear infinite;
+      }
+
+      @keyframes matrixAnimation {
+        0% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(70%);
+        }
+      }
+
+      #matrixDisplay {
+        animation: matrixAnimation 30s linear infinite;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>חפש מספר במטריקס {1-100}</h2>
+    <input type="number" id="inputNumber" min="1" max="100" />
+    <button onclick="searchMatrix()">חפש</button>
+    <p id="result"></p>
+    <pre id="matrixDisplay" style="display: none"></pre>
+    <button onclick="toggleMatrixDisplay()">הצג / הסתר מטריקס</button>
+
+    <script>
+      let matrixVisible = false;
+
+      const matrix = Array.from({ length: 10 }, () =>
+        Array.from({ length: 10 }, () => Math.floor(Math.random() * 100) + 1)
+      );
+
+      function searchMatrix() {
+        const inputNumber = getInputNumber();
+        const locations = findNumberInMatrix(inputNumber);
+        displaySearchResult(locations);
+      }
+
+      function toggleMatrixDisplay() {
+        const matrixDisplay = document.getElementById("matrixDisplay");
+        const button = document.querySelector("button");
+
+        if (matrixVisible) {
+          matrixDisplay.style.display = "none";
+        } else {
+          matrixDisplay.style.display = "block";
+          displayMatrix();
+        }
+
+        matrixVisible = !matrixVisible;
+      }
+
+      function getInputNumber() {
+        return parseInt(document.getElementById("inputNumber").value);
+      }
+
+      function findNumberInMatrix(inputNumber) {
+        return matrix
+          .flatMap(
+            (
+              row,
+              i // row number
+            ) =>
+              row.map(
+                (
+                  num,
+                  j // column number
+                ) => (num === inputNumber ? `[${i + 1}, ${j + 1}]` : null) // ([0] + 1)
+              )
+          )
+          .filter(Boolean);
+      }
+
+      function displaySearchResult(locations) {
+        const resultElement = document.getElementById("result");
+        resultElement.textContent =
+          locations.length === 0
+            ? "מספר לא נמצא במטריקס"
+            : `המספר נמצא במטריקס במיקומים: ${locations.join(", ")}`;
+      }
+
+      function displayMatrix() {
+        const matrixDisplay = document.getElementById("matrixDisplay");
+        let matrixText = "";
+        for (let i = 0; i < matrix.length; i++) {
+          matrixText += matrix[i].join("\t") + "\n";
+        }
+        matrixDisplay.textContent = matrixText;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Add and Display Movies</title>
+    <style>
+      body {
+        background-color: #d5aeef;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+
+      th {
+        background-color: #918bee;
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      tr {
+        border: 1px solid #dddddd;
+      }
+
+      td {
+        border: 1px solid #1b0ea1;
+        text-align: left;
+        padding: 8px;
+      }
+
+      td.image {
+        width: 200px;
+        height: 300px;
+        overflow: hidden;
+      }
+
+      td.image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      #movieList {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <label for="movieNameInput">Movie Name:</label>
+    <input type="text" id="movieNameInput" />
+    <label for="movieYearInput">Year of Release:</label>
+    <input type="number" id="movieYearInput" />
+    <label for="movieActorInput">Main Actor:</label>
+    <input type="text" id="movieActorInput" />
+    <label for="movieGenreInput">Genre:</label>
+    <input type="text" id="movieGenreInput" />
+    <button onclick="addMovie()">Add Movie</button>
+    <br /><br />
+    <label for="searchInput">Search Movie:</label>
+    <input type="text" id="searchInput" />
+    <button onclick="searchMovie()">Search</button>
+
+    <ul id="movieList"></ul>
+
+    <script>
+      const API_KEY = "eea7f9ff6fccf63ee34eb2d80de4ac35";
+
+      const movies = [];
+
+      function addMovie() {
+        const nameInput = document.getElementById("movieNameInput").value;
+        const yearInput =
+          document.getElementById("movieYearInput").valueAsNumber;
+        const actorInput = document.getElementById("movieActorInput").value;
+        const genreInput = document.getElementById("movieGenreInput").value;
+
+        const movie = {
+          name: nameInput,
+          year: yearInput,
+          mainActor: actorInput,
+          genre: genreInput,
+        };
+
+        movies.push(movie);
+
+        document.getElementById("movieNameInput").value = "";
+        document.getElementById("movieYearInput").value = "";
+        document.getElementById("movieActorInput").value = "";
+        document.getElementById("movieGenreInput").value = "";
+
+        const movieList = document.getElementById("movieList");
+        movieList.innerHTML = "";
+
+        const table = document.createElement("table");
+
+        const tableHeader = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+        const headers = ["Image", "Name", "Year", "Main Actor", "Genre"];
+
+        headers.forEach((headerText) => {
+          const headerCell = document.createElement("th");
+          headerCell.textContent = headerText;
+          headerRow.appendChild(headerCell);
+        });
+
+        tableHeader.appendChild(headerRow);
+        table.appendChild(tableHeader);
+
+        const tableBody = document.createElement("tbody");
+
+        // Add the movie to the table
+        const row = document.createElement("tr");
+
+        const imageCell = document.createElement("td");
+        imageCell.classList.add("image");
+
+        // Cells for properties
+        const nameCell = document.createElement("td");
+        const yearCell = document.createElement("td");
+        const actorCell = document.createElement("td");
+        const genreCell = document.createElement("td");
+
+        nameCell.textContent = movie.name;
+        yearCell.textContent = movie.year;
+        actorCell.textContent = movie.mainActor;
+        genreCell.textContent = movie.genre;
+
+        // Display poster
+        displayMoviePoster(movie.name, movie.year, imageCell);
+
+        row.appendChild(imageCell);
+        row.appendChild(nameCell);
+        row.appendChild(yearCell);
+        row.appendChild(actorCell);
+        row.appendChild(genreCell);
+
+        tableBody.appendChild(row);
+
+        table.appendChild(tableBody);
+
+        // Append the table to the movieList element
+        movieList.appendChild(table);
+      }
+
+      function displayMoviePoster(movieName, movieYear, imageCell) {
+        // Clear previous content in the image cell
+        imageCell.innerHTML = "";
+
+        // Make a request to TMDb API to search for the movie poster
+        fetch(
+          `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${movieName}&year=${movieYear}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.results && data.results.length > 0) {
+              // Add a check to ensure there are results
+              const movie = data.results[0];
+              if (movie.poster_path) {
+                const posterUrl = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+                const posterImg = document.createElement("img");
+                posterImg.src = posterUrl;
+
+                // Create a paragraph element for displaying the year
+                const yearParagraph = document.createElement("p");
+
+                // Append the new image and year paragraph to the image cell
+                imageCell.appendChild(posterImg);
+                imageCell.appendChild(yearParagraph);
+              }
+            } else {
+              console.error("Movie not found:", movieName);
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching movie poster:", error);
+          });
+      }
+
+      function searchMovie() {
+        const searchInput = document.getElementById("searchInput").value;
+
+        const movieList = document.getElementById("movieList");
+        movieList.innerHTML = "";
+
+        const table = document.createElement("table");
+
+        const tableHeader = document.createElement("thead");
+        const headerRow = document.createElement("tr");
+        const headers = ["Image", "Name", "Year", "Main Actor", "Genre"];
+
+        headers.forEach((headerText) => {
+          const headerCell = document.createElement("th");
+          headerCell.textContent = headerText;
+          headerRow.appendChild(headerCell);
+        });
+
+        tableHeader.appendChild(headerRow);
+        table.appendChild(tableHeader);
+
+        const tableBody = document.createElement("tbody");
+
+        // Filter movies based on the search input (name or year)
+        const filteredMovies = movies.filter(
+          (movie) =>
+            movie.name.toLowerCase().includes(searchInput.toLowerCase()) ||
+            movie.year.toString().includes(searchInput) // Check if the year matches the search input
+        );
+
+        // Iterate over filtered movies and add them to the table
+        filteredMovies.forEach((movie) => {
+          const row = document.createElement("tr");
+
+          const imageCell = document.createElement("td");
+          imageCell.classList.add("image");
+
+          const nameCell = document.createElement("td");
+          const yearCell = document.createElement("td"); // Add a cell for displaying the year
+          yearCell.classList.add("year"); // Apply the CSS class for the year cell
+          const actorCell = document.createElement("td");
+          const genreCell = document.createElement("td");
+
+          nameCell.textContent = movie.name;
+          yearCell.textContent = movie.year;
+          actorCell.textContent = movie.mainActor;
+          genreCell.textContent = movie.genre;
+
+          displayMoviePoster(movie.name, imageCell);
+
+          row.appendChild(imageCell);
+          row.appendChild(nameCell);
+          row.appendChild(yearCell);
+          row.appendChild(actorCell);
+          row.appendChild(genreCell);
+
+          tableBody.appendChild(row);
+        });
+
+        table.appendChild(tableBody);
+
+        // Append the table to the movieList element
+        movieList.appendChild(table);
+      }
+    </script>
+  </body>
+</html>

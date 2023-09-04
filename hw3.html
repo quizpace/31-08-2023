@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Add and Filter Movies</title>
+    <style>
+      body {
+        background-color: #d5aeef;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+      }
+
+      th {
+        background-color: #538bb6;
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+      }
+
+      tr {
+        border: 1px solid #dddddd;
+        background-color: #d9f9e5;
+      }
+
+      td {
+        border: 1px solid #1b0ea1;
+        text-align: left;
+        padding: 8px;
+      }
+
+      td.image {
+        width: 200px;
+        height: 300px;
+        overflow: hidden;
+      }
+
+      td.image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      #but {
+        color: rgb(127, 24, 24);
+      }
+      #but2 {
+        color: rgb(180, 97, 97);
+      }
+
+      #movieList {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <label for="movieNameInput">Movie Name:</label>
+    <input type="text" id="movieNameInput" />
+    <label for="movieYearInput">Year of Release:</label>
+    <input type="number" id="movieYearInput" />
+    <label for="movieActorInput">Main Actor:</label>
+    <input type="text" id="movieActorInput" />
+    <label for="movieGenreInput">Genre:</label>
+    <input type="text" id="movieGenreInput" />
+    <button id="but" onclick="addMovie()">Add Movie</button>
+
+    <hr />
+
+    <label for="yearFilterInput">Filter by Year:</label>
+    <input type="number" id="yearFilterInput" />
+    <button id="but2" onclick="filterMovies()">Filter Movies</button>
+
+    <ul id="movieList"></ul>
+
+    <script>
+      const API_KEY = "eea7f9ff6fccf63ee34eb2d80de4ac35";
+      const favoriteMovies = [
+        {
+          name: "Fear and Loathing in Las Vegas",
+          year: 1998,
+          mainActor: "Johnny Depp",
+          genre: "Drama",
+        },
+        {
+          name: "Pulp Fiction",
+          year: 1994,
+          mainActor: "John Travolta",
+          genre: "Crime",
+        },
+        {
+          name: "Kill Bill",
+          year: 2003,
+          mainActor: "Uma Thurman",
+          genre: "Action",
+        },
+        {
+          name: "The Big Lebowski",
+          year: 1998,
+          mainActor: "Jeff Bridges",
+          genre: "Comedy",
+        },
+        {
+          name: "American History X",
+          year: 1998,
+          mainActor: "Edward Norton",
+          genre: "Drama",
+        },
+        {
+          name: "City of God",
+          year: 2002,
+          mainActor: "Alexandre Rodrigues",
+          genre: "Crime",
+        },
+        {
+          name: "Fight Club",
+          year: 1999,
+          mainActor: "Edward Norton",
+          genre: "Drama",
+        },
+        {
+          name: "Forrest Gump",
+          year: 1994,
+          mainActor: "Tom Hanks",
+          genre: "Drama",
+        },
+        {
+          name: "Full Metal Jacket",
+          year: 1987,
+          mainActor: "Matthew Modine",
+          genre: "War",
+        },
+        {
+          name: "Jumanji",
+          year: 1995,
+          mainActor: "Robin Williams",
+          genre: "Adventure",
+        },
+        {
+          name: "Leon: The Professional",
+          year: 1994,
+          mainActor: "Jean Reno",
+          genre: "Crime",
+        },
+        {
+          name: "Requiem for a Dream",
+          year: 2000,
+          mainActor: "Ellen Burstyn",
+          genre: "Drama",
+        },
+        {
+          name: "O Brother, Where Art Thou?",
+          year: 2000,
+          mainActor: "George Clooney",
+          genre: "Adventure",
+        },
+        {
+          name: "Snatch",
+          year: 2000,
+          mainActor: "Brad Pitt",
+          genre: "Crime",
+        },
+        {
+          name: "The Mask",
+          year: 1994,
+          mainActor: "Jim Carrey",
+          genre: "Comedy",
+        },
+        {
+          name: "The Matrix",
+          year: 1999,
+          mainActor: "Keanu Reeves",
+          genre: "Sci-Fi",
+        },
+        {
+          name: "Troy",
+          year: 2004,
+          mainActor: "Brad Pitt",
+          genre: "Action",
+        },
+        {
+          name: "Trainspotting",
+          year: 1996,
+          mainActor: "Ewan McGregor",
+          genre: "Drama",
+        },
+        {
+          name: "Thelma & Louise",
+          year: 1991,
+          mainActor: "Susan Sarandon",
+          genre: "Crime",
+        },
+        {
+          name: "The Ten Commandments",
+          year: 1956,
+          mainActor: "Charlton Heston",
+          genre: "Drama",
+        },
+        {
+          name: "Amores Perros",
+          year: 2000,
+          mainActor: "Gael García Bernal",
+          genre: "Drama",
+        },
+        {
+          name: "Cast Away",
+          year: 2000,
+          mainActor: "Tom Hanks",
+          genre: "Adventure",
+        },
+      ];
+
+      // Function to add a movie to the favoriteMovies array
+      function addMovie() {
+        const nameInput = document.getElementById("movieNameInput").value;
+        const yearInput =
+          document.getElementById("movieYearInput").valueAsNumber;
+        const actorInput = document.getElementById("movieActorInput").value;
+        const genreInput = document.getElementById("movieGenreInput").value;
+
+        const movie = {
+          name: nameInput,
+          year: yearInput,
+          mainActor: actorInput,
+          genre: genreInput,
+        };
+
+        favoriteMovies.push(movie);
+
+        // Clear input fields
+        document.getElementById("movieNameInput").value = "";
+        document.getElementById("movieYearInput").value = "";
+        document.getElementById("movieActorInput").value = "";
+        document.getElementById("movieGenreInput").value = "";
+      }
+
+      // Function to display movie posters
+      function displayMoviePoster(movieName, movieYear, image) {
+        // Make a request to TMDb API to search for the movie poster
+        fetch(
+          `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${movieName}&year=${movieYear}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.results && data.results.length > 0) {
+              // Add a check to ensure there are results
+              const movie = data.results[0];
+              if (movie.poster_path) {
+                const posterUrl = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+                image.src = posterUrl; // Set the image source
+              }
+            } else {
+              console.error("Movie not found:", movieName);
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching movie poster:", error);
+          });
+      }
+
+      // Function to filter and display movies
+      function filterMovies() {
+        const yearFilterInput =
+          document.getElementById("yearFilterInput").valueAsNumber;
+        const filteredMovies = favoriteMovies.filter(
+          (movie) => movie.year > yearFilterInput
+        );
+
+        const movieList = document.getElementById("movieList");
+
+        // Clear the existing list and table if it exists
+        movieList.innerHTML = "";
+
+        if (filteredMovies.length === 0) {
+          const noResultsMessage = document.createElement("p");
+          noResultsMessage.textContent = "No movies found.";
+          movieList.appendChild(noResultsMessage);
+        } else {
+          const table = document.createElement("table");
+
+          const tableHeader = document.createElement("thead");
+          const headerRow = document.createElement("tr");
+          const headers = ["Image", "Name", "Year", "Main Actor", "Genre"];
+
+          headers.forEach((headerText) => {
+            const headerCell = document.createElement("th");
+            headerCell.textContent = headerText;
+            headerRow.appendChild(headerCell);
+          });
+
+          tableHeader.appendChild(headerRow);
+          table.appendChild(tableHeader);
+
+          const tableBody = document.createElement("tbody");
+
+          // Add filtered movies to the table
+          filteredMovies.forEach((movie) => {
+            const row = document.createElement("tr");
+
+            const imageCell = document.createElement("td");
+            const image = document.createElement("img");
+            // Display the movie poster
+            displayMoviePoster(movie.name, movie.year, image);
+            imageCell.appendChild(image);
+            imageCell.classList.add("image"); // Apply the image styling
+
+            // Cells for properties
+            const nameCell = document.createElement("td");
+            const yearCell = document.createElement("td");
+            const actorCell = document.createElement("td");
+            const genreCell = document.createElement("td");
+
+            nameCell.textContent = movie.name;
+            yearCell.textContent = movie.year;
+            actorCell.textContent = movie.mainActor;
+            genreCell.textContent = movie.genre;
+
+            row.appendChild(imageCell);
+            row.appendChild(nameCell);
+            row.appendChild(yearCell);
+            row.appendChild(actorCell);
+            row.appendChild(genreCell);
+
+            tableBody.appendChild(row);
+          });
+
+          table.appendChild(tableBody);
+
+          // Append the table to the movieList element
+          movieList.appendChild(table);
+        }
+      }
+
+      function displayMoviePoster(movieName, movieYear, image) {
+        // Make a request to TMDb API to search for the movie poster
+        fetch(
+          `https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=${movieName}&year=${movieYear}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.results && data.results.length > 0) {
+              // Add a check to ensure there are results
+              const movie = data.results[0];
+              if (movie.poster_path) {
+                const posterUrl = `https://image.tmdb.org/t/p/w500${movie.poster_path}`;
+                image.src = posterUrl; // Set the image source
+              }
+            } else {
+              console.error("Movie not found:", movieName);
+            }
+          })
+          .catch((error) => {
+            console.error("Error fetching movie poster:", error);
+          });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Matrix Search</title>
+    <style>
+      body {
+        background-color: black;
+        color: #0f0; /* Green text color */
+        font-family: "Courier New", monospace;
+        font-size: 16px;
+        overflow: hidden;
+        text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+      }
+
+      #matrixDisplay {
+        position: absolute;
+        top: 0;
+        left: 600px;
+        width: 50%;
+        height: 100%;
+        display: block;
+        white-space: pre;
+        background-color: black;
+        color: #0f0; /* Green text color */
+        font-family: "Courier New", monospace;
+        font-size: 16px;
+        overflow: hidden;
+        animation: matrixAnimation 10s linear infinite;
+      }
+
+      @keyframes matrixAnimation {
+        0% {
+          transform: translateY(0);
+        }
+        100% {
+          transform: translateY(70%);
+        }
+      }
+
+      #matrixDisplay {
+        animation: matrixAnimation 30s linear infinite;
+      }
+
+      #result {
+        color: #0f0;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Enter The Matrix [1-100]</h2>
+    <input
+      type="number"
+      id="inputNumber"
+      min="1"
+      max="100"
+      oninput="searchMatrix()"
+    />
+    <p id="result"></p>
+    <pre id="matrixDisplay" style="display: none"></pre>
+    <button onclick="toggleMatrixDisplay()">Show / Hide Matrix</button>
+
+    <script>
+      let matrixVisible = false;
+      const generatedNumbers = new Set();
+
+      const matrix = Array.from({ length: 10 }, () =>
+        Array.from({ length: 10 }, () => oneRandomNumber())
+      );
+
+      function oneRandomNumber() {
+        let randomNumber;
+        do {
+          randomNumber = Math.floor(Math.random() * 100) + 1;
+        } while (generatedNumbers.has(randomNumber));
+        generatedNumbers.add(randomNumber);
+        return randomNumber;
+      }
+
+      function searchMatrix() {
+        const inputNumber = getInputNumber();
+
+        if (inputNumber >= 1 && inputNumber <= 100) {
+          const locations = findNumberInMatrix(inputNumber);
+          displaySearchResult(locations);
+        } else {
+          const resultElement = document.getElementById("result");
+          resultElement.style.color = "red";
+          resultElement.textContent = "Out of range";
+        }
+      }
+
+      function toggleMatrixDisplay() {
+        const matrixDisplay = document.getElementById("matrixDisplay");
+        const button = document.querySelector("button");
+
+        if (matrixVisible) {
+          matrixDisplay.style.display = "none";
+        } else {
+          matrixDisplay.style.display = "block";
+          displayMatrix();
+        }
+
+        matrixVisible = !matrixVisible;
+      }
+
+      function getInputNumber() {
+        return parseInt(document.getElementById("inputNumber").value);
+      }
+
+      function findNumberInMatrix(inputNumber) {
+        return matrix
+          .flatMap((row, i) =>
+            row.map((num, j) =>
+              num === inputNumber ? `[${i + 1}, ${j + 1}]` : null
+            )
+          )
+          .filter(Boolean);
+      }
+
+      function displaySearchResult(locations) {
+        const resultElement = document.getElementById("result");
+        resultElement.style.color = "#0f0"; // Green text
+        if (locations.length === 0) {
+          resultElement.textContent = "Number not found in the matrix";
+        } else {
+          const locationsText = locations.map(
+            (location) => `<span style="color: #0f0;">${location}</span>`
+          );
+          resultElement.innerHTML = `The number is located in the matrix at position: ${locationsText.join(
+            ", "
+          )}`;
+        }
+      }
+
+      function displayMatrix() {
+        const matrixDisplay = document.getElementById("matrixDisplay");
+        let matrixText = "";
+        for (let i = 0; i < matrix.length; i++) {
+          matrixText += matrix[i].join("\t") + "\n";
+        }
+        matrixDisplay.textContent = matrixText;
+      }
+    </script>
+  </body>
+</html>

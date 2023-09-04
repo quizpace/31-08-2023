@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+      let numbers = [];
+      let input;
+
+      do {
+        input = parseInt(prompt("Please enter a number:"));
+
+        numbers.push(input);
+
+        let isDup = numbers.slice(0, -1).includes(input); // (slice the last number & check if input num is already exist)
+
+        if (isDup) {
+          alert("Duplicated number has stopped the loop.");
+          break;
+        }
+      } while (input !== -99);
+
+      console.log("The entered numbers:", numbers);
+    </script>
+  </body>
+</html>
